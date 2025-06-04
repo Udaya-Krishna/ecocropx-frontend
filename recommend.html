@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recommendation</title>
-    <link rel="stylesheet" href="/static/style2.css">
-    <link rel="stylesheet" href="/static/style1.css">
+    <link rel="stylesheet" href="static/style2.css">
+    <link rel="stylesheet" href="static/style1.css">
 </head>
 
 
@@ -20,7 +20,7 @@
     <div class="container">
         
         <header>
-      <div class="logo" onclick="window.location.href='/'">
+      <div class="logo" onclick="window.location.href='index.html'">
         <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40">
           <path d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0z" fill="#00c853" opacity="0.2"/>
           <path d="M22 10c-6.075 0-11 4.925-11 11s4.925 11 11 11 11-4.925 11-11-4.925-11-11-11z" fill="#00c853" opacity="0.4"/>
@@ -33,7 +33,7 @@
       <nav>
         <div class="nav-items">
           <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="recommend.html">Crop Recommendation</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="contact.html">Contact</a></li>
@@ -194,6 +194,12 @@
     </footer>
     
     <script>
+        // Configuration
+        const config = {
+            weatherApiKey: 'YOUR_API_KEY_HERE', // Replace with your API key
+            weatherApiUrl: 'https://api.openweathermap.org/data/2.5/weather'
+        };
+
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             if (params.has('city')) {
@@ -203,24 +209,52 @@
         };
         
         async function getWeather() {
-            let city = document.getElementById("city").value;
-            if (city.length < 3) return;
+            const cityInput = document.getElementById("city");
+            const city = cityInput.value.trim();
             
-            const apiKey = "233a169eca4c3d30d93928de0883ee9a";
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            if (city.length < 3) {
+                showError("Please enter a valid city name (minimum 3 characters)");
+                return;
+            }
             
             try {
-                let response = await fetch(url);
-                let data = await response.json();
+                const response = await fetch(`${config.weatherApiUrl}?q=${encodeURIComponent(city)}&appid=${config.weatherApiKey}&units=metric`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
                 if (data.main) {
                     document.getElementById("temperature").value = data.main.temp;
                     document.getElementById("humidity").value = data.main.humidity;
+                    showSuccess("Weather data updated successfully!");
                 } else {
-                    console.error("City not found");
+                    showError("City not found. Please check the spelling and try again.");
                 }
             } catch (error) {
                 console.error("Error fetching weather data:", error);
+                showError("Failed to fetch weather data. Please try again later.");
             }
+        }
+        
+        function showError(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'alert alert-error';
+            alertContainer.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            document.querySelector('.form-container').insertBefore(alertContainer, document.querySelector('.form-container').firstChild);
+            
+            setTimeout(() => alertContainer.remove(), 5000);
+        }
+        
+        function showSuccess(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'alert alert-success';
+            alertContainer.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.querySelector('.form-container').insertBefore(alertContainer, document.querySelector('.form-container').firstChild);
+            
+            setTimeout(() => alertContainer.remove(), 5000);
         }
         
         function submitData() {
@@ -239,23 +273,17 @@
             });
             
             if (!isValid) {
-                alert("Please fill in all required fields.");
+                showError("Please fill in all required fields.");
                 return;
             }
 
-
-            let phVal=parseFloat(document.getElementById("ph").value);
-            console.log(phVal);
-            if(phVal<0|| phVal>14){
-                console.log("Invalid pH value");
-                alert("Please enter a valid pH value between 0 and 14.");
+            const phVal = parseFloat(document.getElementById("ph").value);
+            if (phVal < 0 || phVal > 14) {
+                showError("Please enter a valid pH value between 0 and 14.");
                 return;
             }
             
-            
-            
-
-            let data = {
+            const data = {
                 city: document.getElementById("city").value,
                 temperature: document.getElementById("temperature").value,
                 humidity: document.getElementById("humidity").value,
@@ -267,32 +295,32 @@
             };
             
             console.log("Submitting data:", data);
-            alert("This is a demo for frontend. Please visit the backend to get the recommendations.");
-            return;
+            showSuccess("This is a demo for frontend. Please visit the backend to get the recommendations.");
         }
 
+        // Mobile menu toggle
         const hamburger = document.querySelector('.mobile-menu');
-    const navItems = document.querySelector('.nav-items');
-    const overlay = document.getElementById('overlay');
-    hamburger.addEventListener('click', () => {
-      navItems.classList.toggle('active');
-      hamburger.classList.toggle('active');
-      overlay.classList.toggle('active');
-    
+        const navItems = document.querySelector('.nav-items');
+        const overlay = document.getElementById('overlay');
+        
+        hamburger.addEventListener('click', () => {
+            navItems.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (navItems.classList.contains('active')) {
+                hamburger.innerHTML = '&#10005;'; // Change to close icon
+            } else {
+                hamburger.innerHTML = '&#9776;'; // Change back to menu icon
+            }
+        });
 
-      if( navItems.classList.contains('active')) {
-        hamburger.innerHTML = '&#10005;'; // Change to close icon
-      } else {
-        hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-      }
-    });
-
-    overlay.addEventListener('click', () => {
-      navItems.classList.remove('active');
-      hamburger.classList.remove('active');
-      overlay.classList.remove('active');
-      hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-    });
+        overlay.addEventListener('click', () => {
+            navItems.classList.remove('active');
+            hamburger.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburger.innerHTML = '&#9776;'; // Change back to menu icon
+        });
     </script>
     
 

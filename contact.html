@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - EcoCropx</title>
-    <link rel="stylesheet" href="/static/styleContact.css">
-    <link rel="stylesheet" href="/static/style1.css">
+    <link rel="stylesheet" href="static/styleContact.css">
+    <link rel="stylesheet" href="static/style1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
   
   <div class="container">
     <header>
-      <div class="logo" onclick="window.location.href='/'">
+      <div class="logo" onclick="window.location.href='index.html'">
         <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40">
           <path d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0z" fill="#00c853" opacity="0.2"/>
           <path d="M22 10c-6.075 0-11 4.925-11 11s4.925 11 11 11 11-4.925 11-11-4.925-11-11-11z" fill="#00c853" opacity="0.4"/>
@@ -29,7 +29,7 @@
       <nav>
         <div class="nav-items">
           <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="recommend.html">Crop Recommendation</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="contact.html">Contact</a></li>
@@ -89,10 +89,10 @@
 
             <div class="contact-form">
                 <h2>Send us a Message</h2>
-                <form action="/send_mail" id="contactForm">
+                <form id="contactForm" onsubmit="return handleSubmit(event)">
                     <div class="form-group">
                         <label for="name" class="label-form">Full Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter your age" required>
+                        <input type="text" id="name" name="name" placeholder="Enter your name" required>
                     </div>
 
                     <div class="form-group">
@@ -110,11 +110,10 @@
                         <textarea id="message" name="message" rows="5" placeholder="Type your message here..." required></textarea>
                     </div>
 
-                    <button type="submit" class="submit-btn" >
+                    <button type="submit" class="submit-btn">
                         <span>Send Message</span>
                         <i class="fas fa-paper-plane"></i>
                     </button>
-                    <input type="hidden" name="access_key" value="10845296-8978-4f36-b797-0240e2ac7f9e">
                 </form>
             </div>
         </div>
@@ -135,11 +134,40 @@
         </div>
     </footer>
 
+    <div class="overlay" id="overlay"></div>
+
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function handleSubmit(event) {
+            event.preventDefault();
             
             const alertContainer = document.getElementById('alert-container');
+            const form = document.getElementById('contactForm');
+            
+            // Basic form validation
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!name || !email || !subject || !message) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Please fill in all required fields.
+                    </div>
+                `;
+                return false;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid email address.
+                    </div>
+                `;
+                return false;
+            }
             
             // Show success message
             alertContainer.innerHTML = `
@@ -152,49 +180,39 @@
             alertContainer.scrollIntoView({ behavior: 'smooth' });
             
             // Reset form
-            this.reset();
+            form.reset();
             
             // Remove alert after 5 seconds
             setTimeout(() => {
                 alertContainer.innerHTML = '';
             }, 5000);
-        });
+            
+            return false;
+        }
         
         // Mobile menu toggle
-        document.querySelector('.mobile-menu').addEventListener('click', function() {
-            document.querySelector('nav ul').classList.toggle('show');
+        const hamburger = document.querySelector('.mobile-menu');
+        const navItems = document.querySelector('.nav-items');
+        const overlay = document.getElementById('overlay');
+        
+        hamburger.addEventListener('click', () => {
+            navItems.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (navItems.classList.contains('active')) {
+                hamburger.innerHTML = '&#10005;'; // Change to close icon
+            } else {
+                hamburger.innerHTML = '&#9776;'; // Change back to menu icon
+            }
         });
 
-
-
-
-
-        const hamburger = document.querySelector('.mobile-menu');
-    const navItems = document.querySelector('.nav-items');
-    const overlay = document.getElementById('overlay');
-    hamburger.addEventListener('click', () => {
-      navItems.classList.toggle('active');
-      hamburger.classList.toggle('active');
-      overlay.classList.toggle('active');
-    
-
-      if( navItems.classList.contains('active')) {
-        hamburger.innerHTML = '&#10005;'; // Change to close icon
-      } else {
-        hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-      }
-    });
-
-    overlay.addEventListener('click', () => {
-      navItems.classList.remove('active');
-      hamburger.classList.remove('active');
-      overlay.classList.remove('active');
-      hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-    });
-
-
-
-
+        overlay.addEventListener('click', () => {
+            navItems.classList.remove('active');
+            hamburger.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburger.innerHTML = '&#9776;'; // Change back to menu icon
+        });
     </script>
 </body>
 </html>
