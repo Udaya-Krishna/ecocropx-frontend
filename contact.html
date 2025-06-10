@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="static/styleContact.css">
     <link rel="stylesheet" href="static/style1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+    (function(){
+        emailjs.init("DuzOinCyJ6aAHEmaq");
+    })();
+    </script>
+    
 </head>
 <body>
 
@@ -170,27 +179,35 @@
 
 
         const hamburger = document.querySelector('.mobile-menu');
-    const navItems = document.querySelector('.nav-items');
-    const overlay = document.getElementById('overlay');
-    hamburger.addEventListener('click', () => {
-      navItems.classList.toggle('active');
-      hamburger.classList.toggle('active');
-      overlay.classList.toggle('active');
+        const navItems = document.querySelector('.nav-items');
+        const overlay = document.getElementById('overlay');
+        hamburger.addEventListener('click', () => {
+          navItems.classList.toggle('active');
+          hamburger.classList.toggle('active');
+
     
 
-      if( navItems.classList.contains('active')) {
-        hamburger.innerHTML = '&#10005;'; // Change to close icon
-      } else {
-        hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-      }
+          if( navItems.classList.contains('active')) {
+            hamburger.innerHTML = '&#10005;'; // Change to close icon
+          } else {
+            hamburger.innerHTML = '&#9776;'; // Change to menu icon
+          }
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        emailjs.sendForm('service_gmsvhu3', 'template_mly762s', this)
+        .then(() => {
+            alert('Message sent successfully!');
+            document.getElementById('contactForm').reset();
+        }, (error) => {
+            console.log('FAILED...', error);
+            alert('Failed to send message. Please try again.');
+        });
     });
 
-    overlay.addEventListener('click', () => {
-      navItems.classList.remove('active');
-      hamburger.classList.remove('active');
-      overlay.classList.remove('active');
-      hamburger.innerHTML = '&#9776;'; // Change back to menu icon
-    });
+    
 
 
 
